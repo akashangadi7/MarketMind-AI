@@ -1,0 +1,3 @@
+# Pyrefly Configuration
+# Set the search path so that Pyrefly resolves packages inside the backend folder correctly.
+search-path = ["backend"]

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: marketmind_db
+    restart: always
+    environment:
+      POSTGRES_DB: marketmind
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgressecretpassword99
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: marketmind_backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgressecretpassword99@db:5432/marketmind
+      - SECRET_KEY=supersecretkeymarketmindai123456!
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: marketmind_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

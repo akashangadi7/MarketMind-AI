@@ -1,0 +1,17 @@
+# Ignored directories
+venv/
+git_portable/
+uploads/
+node_modules/
+.pytest_cache/
+.vscode/
+
+# Local databases and secrets
+*.db
+.env
+
+# Diagnostic screenshots and temporary files
+*.png
+*.html
+__pycache__/
+*.pyc
