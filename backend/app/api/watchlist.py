@@ -5,10 +5,9 @@ from app.core.database import get_db
 from app.api.auth import get_current_user
 from app.models import User, Watchlist
 from app.schemas import WatchlistCreate, WatchlistOut
+from app.services.market_service import get_live_price
 
 router = APIRouter()
-
-from app.services.market_service import get_live_price
 
 @router.get("", response_model=List[WatchlistOut])
 def get_watchlist(
