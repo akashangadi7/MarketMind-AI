@@ -56,11 +56,11 @@ def get_audit_logs(
             
         enriched_logs.append(
             SystemAuditLog(
-                id=log.id,
-                user_id=log.user_id,
-                email=user_email,
-                action=log.action,
-                ip_address=log.ip_address,
+                id=int(log.id),
+                user_id=int(log.user_id) if log.user_id is not None else None,
+                email=str(user_email) if user_email is not None else None,
+                action=str(log.action),
+                ip_address=str(log.ip_address) if log.ip_address is not None else None,
                 timestamp=log.timestamp
             )
         )
@@ -86,7 +86,7 @@ def toggle_user_active(
     if user.id == admin.id:
         raise HTTPException(status_code=400, detail="Cannot disable your own administrative account")
         
-    user.is_active = not user.is_active
+    user.is_active = not bool(user.is_active)
     db.commit()
     db.refresh(user)
     return user
@@ -105,7 +105,7 @@ def change_user_role(
     if role not in ["admin", "analyst", "trader", "retail"]:
          raise HTTPException(status_code=400, detail="Invalid role specification")
          
-    user.role = role
+    user.role = str(role)
     db.commit()
     db.refresh(user)
     return user

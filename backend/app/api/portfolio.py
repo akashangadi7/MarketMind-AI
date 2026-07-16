@@ -19,24 +19,24 @@ def get_portfolio(
     enriched_assets = []
     for asset in assets:
         # Fetch live price
-        live_price = get_live_price(asset.symbol, asset.asset_type) or asset.average_buy_price
+        live_price = get_live_price(str(asset.symbol), str(asset.asset_type)) or float(asset.average_buy_price)
         
-        current_value = asset.shares_quantity * live_price
-        cost_basis = asset.shares_quantity * asset.average_buy_price
+        current_value = float(asset.shares_quantity) * float(live_price)
+        cost_basis = float(asset.shares_quantity) * float(asset.average_buy_price)
         p_l = current_value - cost_basis
         p_l_pct = (p_l / cost_basis * 100.0) if cost_basis > 0 else 0.0
         
         enriched_assets.append(
             PortfolioAssetOut(
-                id=asset.id,
-                symbol=asset.symbol,
-                asset_type=asset.asset_type,
-                shares_quantity=asset.shares_quantity,
-                average_buy_price=asset.average_buy_price,
-                current_price=live_price,
-                current_value=current_value,
-                profit_loss=p_l,
-                profit_loss_pct=p_l_pct
+                id=int(asset.id),
+                symbol=str(asset.symbol),
+                asset_type=str(asset.asset_type),
+                shares_quantity=float(asset.shares_quantity),
+                average_buy_price=float(asset.average_buy_price),
+                current_price=float(live_price),
+                current_value=float(current_value),
+                profit_loss=float(p_l),
+                profit_loss_pct=float(p_l_pct)
             )
         )
     return enriched_assets
@@ -80,19 +80,19 @@ def record_transaction(
             db.add(asset)
         else:
             # Re-calculate average buy price
-            total_shares = asset.shares_quantity + tx_in.quantity
-            total_cost = (asset.shares_quantity * asset.average_buy_price) + (tx_in.quantity * tx_in.price)
-            asset.average_buy_price = total_cost / total_shares if total_shares > 0 else 0
-            asset.shares_quantity = total_shares
+            total_shares = float(asset.shares_quantity) + tx_in.quantity
+            total_cost = (float(asset.shares_quantity) * float(asset.average_buy_price)) + (tx_in.quantity * tx_in.price)
+            asset.average_buy_price = float(total_cost / total_shares if total_shares > 0 else 0.0)
+            asset.shares_quantity = float(total_shares)
     else:  # SELL
-        if not asset or asset.shares_quantity < tx_in.quantity:
+        if not asset or float(asset.shares_quantity) < tx_in.quantity:
             raise HTTPException(
                 status_code=400,
-                detail=f"Insufficient holdings to sell {tx_in.quantity} of {symbol}. Current holdings: {asset.shares_quantity if asset else 0}"
+                detail=f"Insufficient holdings to sell {tx_in.quantity} of {symbol}. Current holdings: {float(asset.shares_quantity) if asset else 0}"
             )
         
-        asset.shares_quantity -= tx_in.quantity
-        if asset.shares_quantity <= 0:
+        asset.shares_quantity = float(float(asset.shares_quantity) - tx_in.quantity)
+        if float(asset.shares_quantity) <= 0:
             db.delete(asset)
 
     # Save transaction
