@@ -1,7 +1,8 @@
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 import os
 
 from app.core.config import settings
@@ -49,3 +50,15 @@ def health_check():
         "project": settings.PROJECT_NAME,
         "database": settings.DATABASE_URL.split("://")[0]
     }
+
+# Serve the static frontend SPA — catch-all for any non-API route
+STATIC_FRONTEND = Path(__file__).parent.parent / "static_frontend"
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def serve_spa(full_path: str):
+    if STATIC_FRONTEND.exists():
+        file_path = STATIC_FRONTEND / full_path
+        if file_path.is_file():
+            return FileResponse(str(file_path))
+        return FileResponse(str(STATIC_FRONTEND / "index.html"))
+    return {"detail": "Not found"}

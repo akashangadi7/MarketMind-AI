@@ -7,10 +7,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copy backend source code
+COPY backend/ .
+
+# Copy the static frontend to be served by FastAPI
+COPY static_frontend/ static_frontend/
 
 EXPOSE 8000
 
