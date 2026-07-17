@@ -39,7 +39,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_HOST
-        fromService:
-          name: marketmind-backend
-          type: web
-          property: host
+        value: marketmind-backend-7hwi.onrender.com
