@@ -33,7 +33,7 @@ def start_backend():
         
     print(f"[SYSTEM] Launching FastAPI backend server on port {PORT_BACKEND}...")
     process = subprocess.Popen(
-        [VENV_PYTHON, "-m", "uvicorn", "app.main:app", "--port", str(PORT_BACKEND)],
+        [VENV_PYTHON, "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", str(PORT_BACKEND)],
         cwd=BACKEND_DIR,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -60,9 +60,19 @@ def serve_frontend():
     os.chdir(FRONTEND_DIR)
     handler = SilentHTTPRequestHandler
     
-    with socketserver.TCPServer(("127.0.0.1", PORT_FRONTEND), handler) as httpd:
-        print(f"[SYSTEM] Frontend served at http://127.0.0.1:{PORT_FRONTEND}")
+    with socketserver.TCPServer(("0.0.0.0", PORT_FRONTEND), handler) as httpd:
+        print(f"[SYSTEM] Frontend served on port {PORT_FRONTEND}")
         httpd.serve_forever()
+
+def get_local_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
 
 def main():
     if not os.path.exists(VENV_PYTHON):
@@ -86,9 +96,11 @@ def main():
     print(f"\n[SYSTEM] Launching web browser for: {url}")
     webbrowser.open(url)
     
+    local_ip = get_local_ip()
     print("\n" + "="*60)
     print(" MarketMind AI Platform is fully active.")
-    print(f" - Frontend web app: http://127.0.0.1:{PORT_FRONTEND}")
+    print(f" - Frontend web app (Local): http://127.0.0.1:{PORT_FRONTEND}")
+    print(f" - Frontend web app (Network): http://{local_ip}:{PORT_FRONTEND}")
     print(f" - Backend API docs: http://127.0.0.1:{PORT_BACKEND}/docs")
     print(" Press Ctrl+C to terminate both servers.")
     print("="*60 + "\n")

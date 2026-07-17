@@ -1,9 +1,15 @@
 import axios from 'axios'
 
-// Dynamically select API endpoint base. In docker proxy, it serves off same origin, locally off port 8000.
-const API_BASE = window.location.port === '5173'
-  ? 'http://localhost:8000/api/v1'
-  : '/api/v1';
+// Dynamically select API endpoint base.
+// - On Render: VITE_API_HOST is injected at build time pointing to the backend service host.
+// - In Docker (nginx proxy): falls back to same-origin /api/v1.
+// - Local dev (port 5173): proxies directly to localhost:8000.
+const viteApiHost = import.meta.env.VITE_API_HOST as string | undefined;
+const API_BASE = viteApiHost
+  ? `https://${viteApiHost}/api/v1`
+  : window.location.port === '5173'
+    ? 'http://localhost:8000/api/v1'
+    : '/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE,

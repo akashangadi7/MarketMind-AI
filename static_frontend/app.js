@@ -1,5 +1,6 @@
 // MarketMind AI Platform JS Engine
-const API_BASE = 'http://127.0.0.1:8000/api/v1';
+const API_BASE_HOST = window.location.hostname;
+const API_BASE = `http://${API_BASE_HOST}:8000/api/v1`;
 
 // Global application state
 const state = {
@@ -100,7 +101,7 @@ async function request(endpoint, options = {}) {
 async function checkBackendConnection() {
     const statusLabel = document.getElementById('api-status');
     try {
-        const res = await fetch('http://127.0.0.1:8000/health');
+        const res = await fetch(`http://${API_BASE_HOST}:8000/health`);
         if (res.ok) {
             statusLabel.className = 'status-indicator connected';
             statusLabel.innerHTML = '<span class="status-dot"></span> API Connected';
@@ -393,7 +394,7 @@ function showReport(id, history) {
     document.getElementById('report-title').textContent = `Analysis Report: ${record.asset_symbol}`;
     document.getElementById('report-meta').textContent = `Analyzed on: ${new Date(record.created_at).toLocaleString()} | Type: ${record.asset_type.toUpperCase()}`;
     
-    const imagePath = record.chart_image_path ? `http://127.0.0.1:8000${record.chart_image_path}` : '';
+    const imagePath = record.chart_image_path ? `http://${API_BASE_HOST}:8000${record.chart_image_path}` : '';
     document.getElementById('report-img').src = imagePath;
     
     const res = record.analysis_result;
@@ -449,10 +450,10 @@ function showReport(id, history) {
     
     // Wire download buttons
     document.getElementById('export-csv-btn').onclick = () => {
-        window.open(`http://127.0.0.1:8000/api/v1/analysis/${record.id}/export/csv?token=${state.token}`, '_blank');
+        window.open(`http://${API_BASE_HOST}:8000/api/v1/analysis/${record.id}/export/csv?token=${state.token}`, '_blank');
     };
     document.getElementById('export-pdf-btn').onclick = () => {
-        window.open(`http://127.0.0.1:8000/api/v1/analysis/${record.id}/export/pdf?token=${state.token}`, '_blank');
+        window.open(`http://${API_BASE_HOST}:8000/api/v1/analysis/${record.id}/export/pdf?token=${state.token}`, '_blank');
     };
 
     // Scroll details card into viewport view
