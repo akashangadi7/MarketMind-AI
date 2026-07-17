@@ -71,11 +71,11 @@ def record_transaction(
     if tx_type == "BUY":
         if not asset:
             asset = PortfolioAsset(
-                user_id=current_user.id,
-                symbol=symbol,
-                asset_type=asset_type,
-                shares_quantity=tx_in.quantity,
-                average_buy_price=tx_in.price
+                user_id=int(current_user.id), # type: ignore
+                symbol=str(symbol),
+                asset_type=str(asset_type),
+                shares_quantity=float(tx_in.quantity),
+                average_buy_price=float(tx_in.price)
             )
             db.add(asset)
         else:
@@ -97,17 +97,17 @@ def record_transaction(
 
     # Save transaction
     db_tx = Transaction(
-        user_id=current_user.id,
-        symbol=symbol,
-        type=tx_type,
-        quantity=tx_in.quantity,
-        price=tx_in.price
+        user_id=int(current_user.id), # type: ignore
+        symbol=str(symbol),
+        type=str(tx_type),
+        quantity=float(tx_in.quantity),
+        price=float(tx_in.price)
     )
     db.add(db_tx)
     
     # Audit log
     audit = AuditLog(
-        user_id=current_user.id,
+        user_id=int(current_user.id), # type: ignore
         action=f"PORTFOLIO_{tx_type}_{symbol}"
     )
     db.add(audit)

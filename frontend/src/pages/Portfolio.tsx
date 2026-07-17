@@ -63,7 +63,7 @@ const Portfolio: React.FC = () => {
 
     try {
       await api.post('/portfolio/transaction', {
-        symbol: symbol.toUpperCase().strip(),
+        symbol: symbol.toUpperCase().trim(),
         type,
         quantity,
         price
