@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -36,6 +37,10 @@ app.include_router(portfolio.router, prefix=f"{settings.API_V1_STR}/portfolio", 
 app.include_router(watchlist.router, prefix=f"{settings.API_V1_STR}/watchlist", tags=["Watchlist Manager"])
 app.include_router(calculator.router, prefix=f"{settings.API_V1_STR}/calculator", tags=["Position Calculator"])
 app.include_router(admin.router, prefix=f"{settings.API_V1_STR}/admin", tags=["Admin Controls"])
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
 
 @app.get("/health", tags=["Status"])
 def health_check():
